@@ -1,13 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import CommonPost from "../components/common/CommonPost";
+import Button from "../components/common/Button";
+import { blogservices } from "../services/api";
 
 const BlogHome = () => {
-  <Navbar />;
+  const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await blogservices.blog();
+        setAllProducts(response.products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <>
-      {/* <Navbar /> */}
-
       <div className="container">
         <header className="mb-10">
           <h1 className="font-light text-5xl">Blog</h1>
@@ -16,11 +29,16 @@ const BlogHome = () => {
           </h2>
         </header>
         <main className="flex flex-col gap-7">
-          <CommonPost />
-          <CommonPost />
-          <CommonPost />
-          <CommonPost />
-          <CommonPost />
+          {allProducts &&
+            allProducts.map((product) => (
+              <CommonPost
+                key={product.id}
+                title={product.title}
+                description={product.description}
+                thumbnail={product.thumbnail}
+                id={product.id}
+              />
+            ))}
         </main>
       </div>
     </>
